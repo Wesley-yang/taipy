@@ -9,6 +9,7 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
+import io
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Set, Union
 
@@ -238,7 +239,9 @@ class ExcelDataNode(DataNode, _FileDataNodeMixin, _TabularDataNodeMixin):
     def _do_read_excel(
         self, path: str, sheet_names, kwargs
     ) -> Union[Dict[Union[int, str], pd.DataFrame], pd.DataFrame]:
-        return pd.read_excel(path, sheet_name=sheet_names, **kwargs)
+        with open(path, "rb") as f:
+            file_io_excel_obj = io.BytesIO(f.read())
+        return pd.read_excel(file_io_excel_obj, sheet_name=sheet_names, **kwargs)
 
     def __get_sheet_names_and_header(self, sheet_names):
         kwargs = {}
